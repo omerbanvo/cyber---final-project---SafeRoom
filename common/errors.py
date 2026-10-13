@@ -22,3 +22,7 @@ class InvalidFrame(SafeRoomError):
 
 class ConnectionClosed(SafeRoomError):
     """The other side closed the connection."""
+
+
+class ProtocolError(SafeRoomError):
+    """message is not valid according to the protocol"""
