@@ -7,7 +7,11 @@ from common.errors import ConnectionClosed, FrameTooLarge, InvalidFrame
 def recv_exact(sock, n: int) ->bytes:
     b = b""
     while len(b) < n:
-        chunk = sock.recv(n - len(b))
+        try:
+            chunk = sock.recv(n - len(b))
+        except OSError as e:
+            raise ConnectionClosed(f"Connection lost {e}") from e 
+
         if not chunk:
             raise ConnectionClosed("connection faild: connection stopped unexpectedly before recieveing expected data ")
         b+=chunk
@@ -18,7 +22,10 @@ def send_frame(sock, msg_type: int, payload: bytes) -> None:
     length = len(payload) + 1
     
     header = struct.pack(">IB", length, msg_type)
-    sock.sendall(header + payload)
+    try:
+        sock.sendall(header + payload)
+    except OSError as e:
+        raise ConnectionClosed(f"Connection lost {e}") from e 
     
 
 
