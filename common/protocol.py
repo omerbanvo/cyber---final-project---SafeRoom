@@ -29,13 +29,13 @@ def encode_message(msg_type: MsgType, data: dict) ->tuple[int, bytes]:
 
 
 REQUIRED_FIELDS = {
-    MsgType.HELLO: ["version", "req_id"],
-    MsgType.WELCOME: ["req_id", "client_id"],
-    MsgType.PING: ["req_id"],
-    MsgType.PONG: ["req_id"],
-    MsgType.BYE: [],
-    MsgType.ERROR: ["code", "message"],
-    MsgType.BROADCAST_TEST: ["text"],
+    MsgType.HELLO: {"version": int , "req_id": int},
+    MsgType.WELCOME: {"req_id": int, "client_id": str },
+    MsgType.PING: {"req_id": int},
+    MsgType.PONG: {"req_id": int},
+    MsgType.BYE: {},
+    MsgType.ERROR: {"code": str, "message": str},
+    MsgType.BROADCAST_TEST: {"text": str},
 }
 
 def decode_message(msg_type: int, payload: bytes)-> tuple[MsgType, dict]:
@@ -60,8 +60,13 @@ def decode_message(msg_type: int, payload: bytes)-> tuple[MsgType, dict]:
     if not isinstance(data, dict):
         raise ProtocolError("payload must be a JSON object")
 
-    for field in REQUIRED_FIELDS[mtype]:
+    for field, expected_type in REQUIRED_FIELDS[mtype].items():
         if field not in data:
-            raise ProtocolError(f"missing field '{field}' in {mtype.name}")        
+            raise ProtocolError(f"missing field '{field}' in {mtype.name}")
 
+        value = data[field]
+        if isinstance(value, bool) or not isinstance(value, expected_type):
+            raise ProtocolError(
+                f"field '{field}' in {mtype.name} must be {expected_type.__name__}"
+            )
     return mtype, data

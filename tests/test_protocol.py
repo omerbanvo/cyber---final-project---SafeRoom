@@ -38,5 +38,11 @@ class TestProtocol(unittest.TestCase):
     def test_every_type_has_required_fields(self):
         for mtype in MsgType:
             self.assertIn(mtype, REQUIRED_FIELDS)
+
+    def test_wrong_field_type(self):
+        with self.assertRaises(ProtocolError) :
+            decode_message(MsgType.HELLO, b'{"version": "1", "req_id": 1}')
+
+
 if __name__ == "__main__":
     unittest.main()
