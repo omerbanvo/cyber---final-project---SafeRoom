@@ -4,13 +4,6 @@ class SafeRoomError(Exception):
 class ConfigError(SafeRoomError):
     """Problem with the config file."""
 
-class SafeRoomError(Exception):
-    """Base class for all project errors."""
-
-
-class ConfigError(SafeRoomError):
-    """Problem with the config file."""
-
 
 class FrameTooLarge(SafeRoomError):
     """Declared frame length is bigger than the allowed maximum."""
