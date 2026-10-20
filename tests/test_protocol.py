@@ -2,7 +2,7 @@ import unittest
 
 from common.errors import ProtocolError
 from common.protocol import MsgType, decode_message, encode_message
-
+from common.protocol import REQUIRED_FIELDS, MsgType, decode_message, encode_message
 
 class TestProtocol(unittest.TestCase):
 
@@ -35,6 +35,8 @@ class TestProtocol(unittest.TestCase):
         with self.assertRaises(ProtocolError):
             decode_message(MsgType.HELLO, b'{"req_id": 1}')
 
-
+    def test_every_type_has_required_fields(self):
+        for mtype in MsgType:
+            self.assertIn(mtype, REQUIRED_FIELDS)
 if __name__ == "__main__":
     unittest.main()
