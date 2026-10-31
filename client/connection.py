@@ -14,6 +14,8 @@ class Connection:
         self.sock = None
         self._send_lock = threading.Lock()
         self._next_req_id = 1
+        self._closing = False
+        self._thread = None
 
     def send(self, msg_type, data):
         with self._send_lock:
@@ -27,12 +29,12 @@ class Connection:
     def connect(self):
         self.sock = s.socket(s.AF_INET, s.SOCK_STREAM)
         self.sock.connect((self.config.host, self.config.port))
-        thread = threading.Thread(
+        self._thread = threading.Thread(
             target= self._receive_loop,
             name= "reciever", 
             daemon= True
         )
-        thread.start()
+        self._thread.start()
         self.send(MsgType.HELLO, {"version": PROTOCOL_VERSION})
 
     def _receive_loop(self):
@@ -42,14 +44,25 @@ class Connection:
                 mtype, data = decode_message(msg_type= mtype, payload= payload)
                 self.on_message(mtype, data)
         except ConnectionClosed:
-            self.on_disconnect("server closed the connection")
+            if not self._closing:
+                self.on_disconnect("server closed the connection")
         except SafeRoomError as e:
-            self.on_disconnect(f"bad data from server: {e}")
+            if not self._closing:
+                self.on_disconnect(f"bad data from server: {e}")
 
 
     def close(self):
+        self._closing = True
         try:
             self.send(MsgType.BYE, {})
         except ConnectionClosed:
             pass
+        try:
+            self.sock.shutdown(s.SHUT_RDWR)
+        except OSError:
+            pass
         self.sock.close()
+        if self._thread is not None:
+            self._thread.join(timeout=2)
+
+   

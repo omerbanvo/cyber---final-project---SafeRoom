@@ -41,8 +41,8 @@ class Server():
                 name= f"client- {handler.client_id}" , 
                 daemon= True
             )
-            thread.start()
+            
             logger.info(f"client {handler.client_id} connected form {addr}")
-
+            thread.start()
         
         
