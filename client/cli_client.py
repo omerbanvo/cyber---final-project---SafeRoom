@@ -18,8 +18,7 @@ def on_message(mtype, data) -> None:
     elif mtype == MsgType.BROADCAST_TEST:
         print(f"[{data['from']}] {data['text']}")
     else:
-        print(f"{mtype.name}: {data}")
-
+            print(f"{mtype.name}: {data}")
 
 def on_disconnect(reason) -> None:
     print(f"disconnected: {reason}")

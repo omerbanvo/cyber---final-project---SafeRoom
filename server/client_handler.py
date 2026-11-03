@@ -78,7 +78,21 @@ class ClientHandler:
         logger.info(f"client {self.client_id} said bye")
         self.state = ClientState.CLOSED
 
-
+    def _handle_broadcast(self, data):
+        message = {"from": self.client_id, "text": data["text"]}
+        clients = self.registry.snapshot()
+        count = 0
+        for other in clients:
+            if other is self:
+                continue
+            if other.state != ClientState.READY:
+                continue
+            try:
+                other.send(MsgType.BROADCAST_TEST, message)
+                count += 1
+            except ConnectionClosed as e:
+                logger.warning(f"broadcast to {other.client_id} failed: {e}")
+        logger.info(f"broadcast from {self.client_id} sent to {count} clients")
     def handle_message(self, mtype, data):
 
         logger.info(f"received {mtype.name} from {self.client_id}") 
@@ -97,6 +111,8 @@ class ClientHandler:
             self._handle_bye(data)
         elif mtype == MsgType.PONG:
             pass
+        elif mtype == MsgType.BROADCAST_TEST:
+            self._handle_broadcast(data)
         else:
             self.send_error(
                 ErrorCode.BAD_MESSAGE,
