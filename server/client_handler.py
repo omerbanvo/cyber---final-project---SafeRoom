@@ -51,14 +51,15 @@ class ClientHandler:
             pass
 
     def run(self):
+        self.sock.settimeout(self.config.hello_timeout)
+
         try:
             while self.state != ClientState.CLOSED:
                 msg_type, payload = recv_frame(self.sock, self.config.max_frame_size)
                 msg_type, data = decode_message(msg_type, payload)
                 self.handle_message(msg_type, data)
-        except ConnectionClosed:
-            logger.info(f"client {self.client_id} disconnected")
-
+        except ConnectionClosed as e:
+            logger.info(f"client {self.client_id} disconnected: {e}")
         except SafeRoomError as e:
             logger.warning(f"client {self.client_id} sent bad data: {e}")
 
@@ -81,6 +82,7 @@ class ClientHandler:
             return
         
         self.state = ClientState.READY
+        self.sock.settimeout(None)
         self.send(MsgType.WELCOME, {"req_id": req_id, "client_id": self.client_id})
         logger.info(f"client {self.client_id} is READY")
 

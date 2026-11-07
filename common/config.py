@@ -8,6 +8,7 @@ class ServerConfig:
     port: int = 31337
     max_clients: int = 4
     max_frame_size: int = 1048576
+    hello_timeout: int = 10
 
 
 def load_config(path: str = "config/config.ini") -> ServerConfig:
@@ -29,7 +30,8 @@ def load_config(path: str = "config/config.ini") -> ServerConfig:
             host = section.get("host", fallback= defaults.host), 
             port = section.getint("port", fallback= defaults.port),
             max_clients= section.getint("max_clients", fallback= defaults.max_clients),
-            max_frame_size= section.getint("max_frame_size", fallback= defaults.max_frame_size)
+            max_frame_size= section.getint("max_frame_size", fallback= defaults.max_frame_size),
+            hello_timeout=section.getint("hello_timeout", fallback=defaults.hello_timeout),
 
         )
     except ValueError as e:
