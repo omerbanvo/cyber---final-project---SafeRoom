@@ -59,7 +59,10 @@ class ClientHandler:
                 msg_type, data = decode_message(msg_type, payload)
                 self.handle_message(msg_type, data)
         except ConnectionClosed as e:
-            logger.info(f"client {self.client_id} disconnected: {e}")
+            if isinstance(e.__cause__, TimeoutError):
+                logger.warning(f"client {self.client_id} timed out before HELLO")
+            else:
+                logger.info(f"client {self.client_id} disconnected: {e}")
         except SafeRoomError as e:
             logger.warning(f"client {self.client_id} sent bad data: {e}")
 
