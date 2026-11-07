@@ -1,5 +1,6 @@
 import logging
 import threading
+import socket
 import uuid
 from enum import Enum
 
@@ -29,11 +30,25 @@ class ClientHandler:
         mtype, message = encode_message(msg_type, data)
         with self._send_lock:
             send_frame(self.sock, mtype, message)
+
+
     def send_error(self, code, message, req_id=None )-> None: 
         data = {"code": code, "message": message}
         if req_id is not None: 
             data["req_id"]= req_id
         self.send(msg_type= MsgType.ERROR, data=data)
+
+
+    def shutdown(self):
+        try:
+            self.send(MsgType.BYE, {"reason": "server is shutting down"})
+        except ConnectionClosed:
+            pass
+        self.state = ClientState.CLOSED
+        try:
+            self.sock.shutdown(socket.SHUT_RDWR)
+        except OSError:
+            pass
 
     def run(self):
         try:

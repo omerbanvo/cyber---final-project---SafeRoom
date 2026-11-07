@@ -41,8 +41,19 @@ class Server():
                 name= f"client- {handler.client_id}" , 
                 daemon= True
             )
-            
+            handler.thread = thread
+
             logger.info(f"client {handler.client_id} connected form {addr}")
             thread.start()
+
+    def stop(self):
+        self.server_sock.close()
+        handlers = self.registry.snapshot()
+        for handler in handlers:
+            handler.shutdown()
+        for handler in handlers:
+            handler.thread.join(timeout=2)
+        logger.info("server stopped")
+    
         
         

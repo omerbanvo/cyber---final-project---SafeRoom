@@ -17,6 +17,8 @@ def on_message(mtype, data) -> None:
         print(f"error {data['code']}: {data['message']}")
     elif mtype == MsgType.BROADCAST_TEST:
         print(f"[{data['from']}] {data['text']}")
+    elif mtype == MsgType.BYE:
+        print(f"server says bye: {data.get('reason', '')}")
     else:
             print(f"{mtype.name}: {data}")
 
