@@ -10,6 +10,9 @@ from common.protocol import MsgType, decode_message, encode_message, ErrorCode, 
 
 logger = logging.getLogger(__name__)
 
+CLIENT_ID_LENGTH = 8   # hex characters taken from a random UUID
+
+
 class ClientState(Enum):
     CONNECTED = "connected"
     READY = "ready" 
@@ -21,7 +24,7 @@ class ClientHandler:
         self.addr = addr
         self.registry = registry
         self.config = config
-        self.client_id = uuid.uuid4().hex[:8]
+        self.client_id = uuid.uuid4().hex[:CLIENT_ID_LENGTH]
         self.state = ClientState.CONNECTED 
         self._send_lock = threading.Lock()
 

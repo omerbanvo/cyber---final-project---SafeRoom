@@ -6,6 +6,9 @@ from common.framing import recv_frame, send_frame
 from common.protocol import PROTOCOL_VERSION, MsgType, decode_message, encode_message
 from common.config import ServerConfig
 
+CLOSE_JOIN_TIMEOUT = 2.0   # seconds to wait for the receiver thread on close
+
+
 class Connection:
     def __init__(self, config, on_message, on_disconnect):
         self.config = config
@@ -63,6 +66,6 @@ class Connection:
             pass
         self.sock.close()
         if self._thread is not None:
-            self._thread.join(timeout=2)
+            self._thread.join(timeout=CLOSE_JOIN_TIMEOUT)
 
    

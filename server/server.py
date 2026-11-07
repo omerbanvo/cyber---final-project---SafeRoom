@@ -8,6 +8,11 @@ from common.protocol import MsgType, ErrorCode
 from common.errors import ConnectionClosed
 logger = logging.getLogger(__name__)
 
+
+SHUTDOWN_JOIN_TIMEOUT = 2.0   # seconds to wait for each client thread on shutdown
+ACCEPT_TIMEOUT = 1.0          # accept() wakes up this often, so Ctrl+C works on Windows
+
+
 class Server():
     def __init__(self, config):
         self.config = config
@@ -18,7 +23,7 @@ class Server():
         self.server_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.server_sock.bind((self.config.host, self.config.port))
         self.server_sock.listen()
-        self.server_sock.settimeout(1.0)
+        self.server_sock.settimeout(ACCEPT_TIMEOUT)
 
         logger.info(f"server is listening on {self.config.host}:{self.config.port}")
 
@@ -57,7 +62,7 @@ class Server():
         for handler in handlers:
             handler.shutdown()
         for handler in handlers:
-            handler.thread.join(timeout=2)
+            handler.thread.join(timeout=SHUTDOWN_JOIN_TIMEOUT)
         logger.info("server stopped")
     
         
