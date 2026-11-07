@@ -18,10 +18,15 @@ class Server():
         self.server_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.server_sock.bind((self.config.host, self.config.port))
         self.server_sock.listen()
+        self.server_sock.settimeout(1.0)
+
         logger.info(f"server is listening on {self.config.host}:{self.config.port}")
 
         while True:
-            conn, addr = self.server_sock.accept()
+            try:
+                conn, addr = self.server_sock.accept()
+            except TimeoutError:
+                continue
 
             handler = ClientHandler(conn, addr, self.registry, self.config)
             if not self.registry.add(handler.client_id, handler, self.config.max_clients):
