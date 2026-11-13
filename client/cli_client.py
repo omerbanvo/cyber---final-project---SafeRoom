@@ -2,7 +2,7 @@ import threading
 
 from common.protocol import MsgType
 from client.connection import Connection
-from common.config import load_config
+from common.config import load_client_config
 from common.errors import ConfigError, ConnectionClosed
 
 disconnected = threading.Event()
@@ -29,7 +29,7 @@ def on_disconnect(reason) -> None:
 
 def main():
     try:
-        config = load_config()
+        config = load_client_config()
     except ConfigError as e:
         print(f"error: {e}")
         return 
