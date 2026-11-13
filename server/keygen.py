@@ -26,5 +26,8 @@ def main():
     print(f"public key: {public_bytes.hex()}")
     print(f"fingerprint: {fingerprint(public_bytes)}")
 
+
+
+
 if __name__ == "__main__":
     main()
