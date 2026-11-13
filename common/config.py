@@ -9,6 +9,7 @@ class ServerConfig:
     max_clients: int = 4
     max_frame_size: int = 1048576
     hello_timeout: int = 10
+    identity_key_file: str = "keys/server_identity.key"
 
 
 def load_config(path: str = "config/config.ini") -> ServerConfig:
@@ -32,6 +33,7 @@ def load_config(path: str = "config/config.ini") -> ServerConfig:
             max_clients= section.getint("max_clients", fallback= defaults.max_clients),
             max_frame_size= section.getint("max_frame_size", fallback= defaults.max_frame_size),
             hello_timeout=section.getint("hello_timeout", fallback=defaults.hello_timeout),
+            identity_key_file=section.get("identity_key_file", fallback=defaults.identity_key_file),
 
         )
     except ValueError as e:
